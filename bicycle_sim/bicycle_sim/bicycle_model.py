@@ -132,14 +132,19 @@ class Car(Node):
         # TODO: Milestone 2.2 — Extended Kinematic Bicycle Equations of Motion
         # This simulates the physics of the car moving and turning in the real world.
         # Implement the continuous-time state derivatives based on throttle and steering.
-        pass
+        self.x_dot[0]= self.x[3] * math.cos(self.x[2])  #1
+        self.x_dot[1]=self.x[3] * math.sin(self.x[2])    #2
+        self.x_dot[2]=(self.x[3] / self.wheelbase_length) * math.tan(self.u[1])         #3
+        self.x_dot[3]= self.k_a * self.u[0] - self.c_drag * self.x[3]**2 - self.c_roll * self.x[3]        #4
 
     def update_x(self):
         """Integrates state forward using discrete Forward Euler numerical integration."""
         # TODO: Milestone 2.3 — Forward Euler Integration & Physical Constraints
         # This moves the simulation forward in time step-by-step.
         # Advance the state numerically and apply realistic constraints like max speed.
-        pass
+        self.x = self.x + self.x_dot * self.dt      #5
+        self.x[2] = (self.x[2] + math.pi) % (2 * math.pi) - math.pi        #6
+        self.x[3] = np.clip(self.x[3], 0.0, self.max_speed)          #7
 
     def update_simulation(self):
         """Timer callback coordinating physics update and telemetry broadcast."""
