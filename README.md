@@ -200,13 +200,153 @@ In your `README.md` report, synthesize your takeaways from exploring these organ
 3. **Deterministic vs Sampling Control**: How modern sampling-based controllers (Nav2 MPPI) differ in flexibility, obstacle handling, and compute requirements compared to deterministic optimization (MPC).
 
 ---
+
+
 ## 🏆 Telemetry Benchmark Leaderboard
 
-*(To be completed by the student as part of Milestone 7)*
+I tested each autonomous controller for three laps using the Lap Analyzer.
 
-| Controller Mode | Best Lap Time (s) | Top Speed (m/s) | Mean CTE (m) | Max CTE (m) | RMS CTE (m) | Laps Completed / Status |
-|---|---|---|---|---|---|---|
-| **Manual Teleoperation** | — | — | — | — | — | — |
-| **Lateral PID (Reactive)** | — | — | — | — | — | — |
-| **Pure Pursuit (Preview)** | — | — | — | — | — | — |
-| **Extended Kinematic MPC (Optimal)** | — | — | — | — | — | — |
+| Controller | Best Lap (s) | Top Speed (m/s) | Mean CTE (m) | Max CTE (m) | RMS CTE (m) | Laps |
+|---|---:|---:|---:|---:|---:|---:|
+| Lateral PID | 138.80 | 4.07 | 0.2613 | 1.966 | 0.3447 | 3 |
+| Pure Pursuit | 130.60 | 4.16 | 0.0367 | 0.380 | 0.0607 | 3 |
+| MPC | 122.10 | 4.22 | 0.1010 | 0.539 | 0.1377 | 3 |
+
+MPC achieved the fastest recorded lap, while Pure Pursuit had the lowest tracking error. Lateral PID showed larger errors and some steering oscillations.
+
+The results are based on laps detected by the analyzer. The reported distance per lap differs from the reference track length, so the lap detection still needs verification.
+
+
+
+---
+
+# Individual Project Report
+**Student:** Mahmoud Zoheir Abdelkader
+
+**Environment:** Ubuntu 26.04, ROS 2 Lyrical, Python
+
+## 1. Project Overview
+
+In this project, I worked on controlling a simulated car using ROS 2. The main goal was to make the car follow a racing track while controlling its speed and steering.
+
+I completed Milestones 1 to 5, including the vehicle model, keyboard control, speed PID, path tracking controllers, and lap analyzer.
+
+Milestone 6 was not completed due to time constraints and the approaching submission deadline. However, I plan to complete it independently after the deadline to further improve my skills and understanding.
+
+## 2. Vehicle Model
+
+I used the extended kinematic bicycle model to simulate the car's motion.
+
+The main equations are:
+
+- x_dot = v cos(yaw)
+- y_dot = v sin(yaw)
+- yaw_dot = (v / L) tan(steering)
+- v_dot = acceleration
+
+The model uses Euler integration to update the vehicle position, heading, and speed.
+
+## 3. Speed Control
+
+I implemented a longitudinal PID controller to maintain the target speed.
+
+The PID uses the speed error to calculate the throttle command, with integral clamping to reduce windup.
+
+During testing, the car tracked a target speed of 3 m/s, with an observed speed of about 3.03 m/s.
+
+I also used a velocity profiler to reduce the target speed in sharp corners based on path curvature.
+
+## 4. Path Tracking Controllers
+
+### Lateral PID
+
+The Lateral PID uses cross-track error (CTE) and heading error to calculate steering.
+
+After tuning the gains, the car followed the track, but some steering oscillations were still noticeable.
+
+### Pure Pursuit
+
+Pure Pursuit selects a point ahead of the car on the reference path and calculates the steering angle needed to reach it.
+
+The lookahead distance changes with vehicle speed.
+
+This controller gave smooth tracking during my tests, with CTE samples around 0.02–0.07 m in one observed section.
+
+### MPC
+
+MPC uses the bicycle model to predict future vehicle motion and select steering and acceleration commands.
+
+I implemented a cost function based on tracking errors, speed error, and control effort, using SLSQP optimization and warm start.
+
+The MPC controller ran successfully in the simulation and followed the track during visual testing.
+
+## 5. Lap Analyzer
+
+The Lap Analyzer monitors:
+
+- Lap time and best lap
+- Cross-track error
+- Vehicle speed
+- Heading error
+- Mean, maximum, and RMS CTE
+
+I also added a live telemetry HUD and CTE visualization in RViz.
+
+The telemetry topics were tested successfully. Full-lap statistics still need further verification.
+
+## 6. Controller Comparison
+
+| Feature | Lateral PID | Pure Pursuit | MPC |
+|---|---|---|---|
+| Method | Feedback | Geometric | Predictive |
+| Path preview | No | Yes | Yes |
+| Complexity | Low | Low | High |
+| Observed behavior | Some oscillations | Smooth tracking | Followed the track |
+
+MPC can potentially achieve better tracking because it predicts future motion and considers vehicle constraints. However, it requires more computation and proper tuning.
+
+Pure Pursuit gave the smoothest visible tracking in my tests.
+
+## 7. Benchmark Results
+
+The three-lap results are shown in the Telemetry Benchmark Leaderboard above.
+
+
+## 8. Running the Project
+
+I used Ubuntu 26.04 and ROS 2 Lyrical.
+
+Build the workspace:
+
+```bash
+cd ~/Control_Project
+source /opt/ros/lyrical/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+```
+
+Run one of the controllers:
+
+```bash
+ros2 launch bicycle_sim bicycle_sim.launch.py controller:=lateral_pid
+```
+
+```bash
+ros2 launch bicycle_sim bicycle_sim.launch.py controller:=pure_pursuit
+```
+
+```bash
+ros2 launch bicycle_sim bicycle_sim.launch.py controller:=mpc
+```
+
+Check telemetry:
+
+```bash
+ros2 topic echo /lap/metrics
+```
+
+## 9. Conclusion
+
+I learned how to connect vehicle modeling, PID control, path tracking, and performance monitoring in ROS 2.
+
+Pure Pursuit showed smooth tracking, while MPC introduced predictive control and optimization. More testing is needed for a full performance comparison.
