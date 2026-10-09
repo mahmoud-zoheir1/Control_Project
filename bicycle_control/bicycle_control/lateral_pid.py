@@ -42,7 +42,37 @@ class LateralPIDController:
         # is off the path (CTE) and how misaligned its heading is.
         # Implement PID on the CTE with anti-windup, add a heading correction term,
         # and clamp the output to the steering limits.
-        pass
+                # Proportional term
+        p_term = self.kp * cte
+
+        # Integral term with anti-windup
+        self.integral_cte += cte * self.dt
+        self.integral_cte = max(
+            -self.integral_limit,
+            min(self.integral_cte, self.integral_limit)
+        )
+        i_term = self.ki * self.integral_cte
+
+        # Derivative term
+        derivative = (cte - self.prev_cte) / self.dt
+        d_term = self.kd * derivative
+
+        # Heading error correction
+        yaw_term = self.k_yaw * heading_err
+
+        # Negative feedback for correct steering direction
+        steer = -(p_term + i_term + d_term + yaw_term)
+
+        # Steering saturation
+        steer = max(
+            -self.max_steer_rad,
+            min(steer, self.max_steer_rad)
+        )
+
+        # Save previous error
+        self.prev_cte = cte
+
+        return steer
 
     def reset(self):
         """Resets integrator and previous error state."""

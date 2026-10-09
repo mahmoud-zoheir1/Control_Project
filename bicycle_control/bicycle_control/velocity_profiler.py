@@ -3,7 +3,7 @@ Target Velocity Profiler based on track curvature.
 Calculates maximum safe cornering speeds subject to lateral acceleration limits.
 """
 
-import math  # noqa: F401
+import math
 
 
 class VelocityProfiler:
@@ -15,9 +15,18 @@ class VelocityProfiler:
         self.max_lat_accel = max_lat_accel
 
     def compute_target_speed(self, kappa, fallback_speed=None):
-        """Calculates curvature-limited velocity: v_max = sqrt(a_lat_max / |kappa|)."""
-        # TODO: Milestone 5.1 — Curvature-Limited Velocity Profiler
-        # This controls how fast the car drives based on the road shape.
-        # It slows the car down in sharp turns to prevent slipping.
-        # Implement the formula to calculate safe speed from curvature, and clamp it.
-        pass
+        """Calculate curvature-limited target speed."""
+
+        if abs(kappa) < 1e-6:
+            target_speed = self.max_speed
+        else:
+            target_speed = math.sqrt(
+                self.max_lat_accel / abs(kappa)
+            )
+
+        target_speed = min(target_speed, self.max_speed)
+
+        if fallback_speed is not None:
+            target_speed = min(target_speed, fallback_speed)
+
+        return max(0.0, target_speed)

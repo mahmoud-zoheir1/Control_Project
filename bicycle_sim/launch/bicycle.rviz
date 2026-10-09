@@ -11,7 +11,7 @@ Panels:
         - /LapTelemetry1
         - /Path1
       Splitter Ratio: 0.5
-    Tree Height: 97
+    Tree Height: 362
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -126,6 +126,7 @@ Visualization Manager:
       Enabled: true
       Name: TrackBounds
       Namespaces:
+        Value: true
         track_bounds: true
       Topic:
         Depth: 5
@@ -138,9 +139,8 @@ Visualization Manager:
       Enabled: true
       Name: LapTelemetry
       Namespaces:
-        cte_whisker: true
+        Value: true
         start_gate: true
-        telemetry_hud: true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -222,7 +222,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 19.368785858154297
+      Distance: 30.44205093383789
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -237,10 +237,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.100000023841858
+      Pitch: 0.44000083208084106
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.5700000524520874
+      Yaw: 0.014989146962761879
     Saved: ~
 Window Geometry:
   Displays:
@@ -248,7 +248,7 @@ Window Geometry:
   Height: 800
   Hide Left Dock: true
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd000000010000000000000447000002c6fc0200000005fb000000100044006900730070006c006100790073000000003d000000ec000000c900fffffffb0000001200530065006c0065006300740069006f006e000000012f000000720000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000001a7000000730000005c00fffffffb0000000a005600690065007700730000000220000000a4000000a400fffffffb0000000800540069006d006500000002ca000000390000003900ffffff00000578000002c600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000010000000000000447000002c6fc0200000005fb000000100044006900730070006c006100790073000000003d000000ec000000ca00fffffffb0000001200530065006c0065006300740069006f006e000000012f000000720000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000001a7000000730000005c00fffffffb0000000a005600690065007700730000000220000000a4000000a600fffffffb0000000800540069006d006500000002ca000000390000003a00ffffff00000434000002c400000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: true
   Time:
@@ -257,6 +257,6 @@ Window Geometry:
     collapsed: true
   Views:
     collapsed: true
-  Width: 1400
-  X: 0
-  Y: 27
+  Width: 1076
+  X: 228
+  Y: 117

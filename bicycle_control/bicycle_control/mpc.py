@@ -81,4 +81,115 @@ class KinematicBicycleMPC:
         #      throttle_cmd = accel_cmd / self.k_a
         #    - Return tuple: (delta_cmd, throttle_cmd).
         # ======================================================================
-        pass
+         # Step 1: Horizon and control bounds
+        N = min(self.N, len(ref_trajectory))
+
+        if N < 2:
+            return 0.0, 0.0
+
+        bounds = []
+
+        for k in range(N):
+            bounds.append(
+                (-self.max_steer_rad, self.max_steer_rad)
+            )
+
+            bounds.append(
+                (-self.k_a, self.k_a)
+            )
+        def objective(u):
+            x, y, yaw, v = x0
+            prev_delta = current_steer
+            cost = 0.0
+
+            for k in range(N):
+                delta = u[2 * k]
+                accel = u[2 * k + 1]
+
+                # Predict next vehicle state
+                x += v * math.cos(yaw) * self.dt
+                y += v * math.sin(yaw) * self.dt
+                yaw += (v / self.L) * math.tan(delta) * self.dt
+                v += accel * self.dt
+
+                # Reference state
+                x_ref, y_ref, yaw_ref, v_ref = ref_trajectory[k]
+
+                # Position error
+                dx = x - x_ref
+                dy = y - y_ref
+
+                # Frenet-frame tracking errors
+                e_long = math.cos(yaw_ref) * dx + math.sin(yaw_ref) * dy
+                e_lat = -math.sin(yaw_ref) * dx + math.cos(yaw_ref) * dy
+
+                # Heading and speed errors
+                e_yaw = math.atan2(
+                    math.sin(yaw - yaw_ref),
+                    math.cos(yaw - yaw_ref)
+                )
+                e_v = v - v_ref
+
+                # Steering change
+                d_delta = delta - prev_delta
+
+                # Weighted quadratic cost
+                cost += (
+                    self.w_lat * e_lat**2
+                    + self.w_long * e_long**2
+                    + self.w_yaw * e_yaw**2
+                    + self.w_v * e_v**2
+                    + self.w_steer * delta**2
+                    + self.w_dsteer * d_delta**2
+                    + self.w_accel * accel**2
+                )
+
+                prev_delta = delta
+
+            return cost
+                # Step 3: Warm start
+        if len(self.last_u) == 2 * N:
+            u_init = np.concatenate([
+                self.last_u[2:],
+                self.last_u[-2:]
+            ])
+        else:
+            u_init = np.zeros(2 * N)
+
+        # Ensure initial guess respects the bounds
+        lower = np.array([b[0] for b in bounds])
+        upper = np.array([b[1] for b in bounds])
+        u_init = np.clip(u_init, lower, upper)
+
+        # Step 4: Numerical optimization
+        result = minimize(
+            objective,
+            u_init,
+            method='SLSQP',
+            bounds=bounds,
+            options={
+                'maxiter': 25,
+                'ftol': 1e-3
+            }
+        )
+
+        # Use the optimized solution if valid
+        if result.success and np.all(np.isfinite(result.x)):
+            u_opt = result.x
+        else:
+            u_opt = u_init
+
+        # Save solution for the next MPC cycle
+        self.last_u = u_opt.copy()
+
+        # Receding horizon: apply only the first control step
+        delta_cmd = float(u_opt[0])
+        accel_cmd = float(u_opt[1])
+
+        throttle_cmd = np.clip(
+            accel_cmd / self.k_a,
+            -1.0,
+            1.0
+        )
+
+        return delta_cmd, float(throttle_cmd)

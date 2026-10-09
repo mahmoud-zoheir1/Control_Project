@@ -38,7 +38,7 @@ class ControllerNode(Node):
         # Controllers
         self.pid_longitudinal = PIDLongitudinalController(kp=1.0, ki=0.2, kd=0.05, dt=0.1)
         self.profiler = VelocityProfiler(default_speed=self.target_speed, max_speed=7.5)
-        self.lateral_pid = LateralPIDController(kp=0.8, ki=0.02, kd=0.15, k_yaw=0.5, dt=0.1)
+        self.lateral_pid = LateralPIDController(kp=0.5, ki=0.02, kd=0.15, k_yaw=0.5, dt=0.1)
         self.pure_pursuit = PurePursuitController(
             wheelbase=self.wheelbase, kv=0.25, l_min=0.8, l_max=2.5
         )
