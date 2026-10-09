@@ -350,3 +350,18 @@ ros2 topic echo /lap/metrics
 I learned how to connect vehicle modeling, PID control, path tracking, and performance monitoring in ROS 2.
 
 Pure Pursuit showed smooth tracking, while MPC introduced predictive control and optimization. More testing is needed for a full performance comparison.
+
+
+
+
+VIDEO LINK 
+
+Control Project — Video Walkthrough
+https://drive.google.com/file/d/17BcCibOjiemiFBWGAGoACcOy7p1OSgfC/view?usp=sharing
+## Project Walkthrough Video
+
+[Watch the Control Project Demo](https://drive.google.com/file/d/17BcCibOjiemiFBWGAGoACcOy7p1OSgfC/view?usp=sharing)
+
+## Project Walkthrough Video
+
+[Watch the Control Project Demo](https://drive.google.com/file/d/17BcCibOjiemiFBWGAGoACcOy7p1OSgfC/view?usp=sharing)
